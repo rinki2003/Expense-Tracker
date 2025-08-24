@@ -7,3 +7,5 @@ Features: Add/delete trips, add/edit/delete participants, add expenses, dark/lig
 Tech: HTML, CSS, JavaScript
 
 Usage: Open index.html, add a trip, participants, and expenses, view settlements.
+
+https://splitledger.netlify.app
