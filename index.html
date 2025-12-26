@@ -1,14 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trip Expense Dashboard</title>
-  <link rel="icon" type="image/png" href="icons8-travel-50.png">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trip Expense Dashboard</title>
+<link rel="icon" type="image/png" href="icons8-travel-50.png">
 
 <style>
+    body, li, span, p, h3, h4 {
+  letter-spacing: normal !important;
+}
+
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; background:#f5f5f5; color:#222; transition:0.3s; }
   body.dark { background:#121212; color:#f5f5f5; }
 
@@ -19,46 +21,45 @@
 
   .container { display:flex; min-height:calc(100vh - 70px); }
 
-  /* Sidebar */
-  .sidebar { width:250px; background:#fff; padding:1rem; box-shadow:2px 0 10px rgba(0,191,255,0.2); border-right:2px solid rgba(0,191,255,0.5); transition:0.3s; }
+  .sidebar { width:280px; background:#fff; padding:1rem; box-shadow:2px 0 10px rgba(0,191,255,0.2); border-right:2px solid rgba(0,191,255,0.5); transition:0.3s; overflow-y:auto; }
   body.dark .sidebar { background:#1e1e1e; border-right:2px solid rgba(0,191,255,0.7); box-shadow:2px 0 10px rgba(0,191,255,0.3); }
 
   .sidebar h3 { margin-top:0; }
-  .trip-item { padding:10px; border-radius:10px; margin-bottom:8px; cursor:pointer; transition:0.2s; }
+  .trip-item { padding:10px; border-radius:10px; margin-bottom:8px; cursor:pointer; transition:0.2s; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; }
   .trip-item:hover { background:rgba(0,191,255,0.1); }
   body.dark .trip-item:hover { background:rgba(0,191,255,0.2); }
 
-  .sidebar button { margin-top:10px; width:100%; }
+  .main { flex:1; padding:1rem; overflow-y:auto; }
 
-  /* Main Content */
-  .main { flex:1; padding:1rem; }
-
-  /* Only outer card has border */
-  .card { background:white; padding:1rem; margin-bottom:1rem; border-radius:15px; box-shadow:0 0 15px rgba(0,191,255,0.3); transition:0.3s; }
-  .card.outer { border:2px solid rgba(0,191,255,0.5); } /* Outer border */
+  .card { background:white; padding:1rem; margin-bottom:1rem; border-radius:15px; box-shadow:0 0 15px rgba(0,191,255,0.3); transition:0.3s; word-break: break-word; }
+  .card.outer { border:2px solid rgba(0,191,255,0.5); }
   body.dark .card { background:#1e1e1e; box-shadow:0 0 15px rgba(0,191,255,0.5); }
   body.dark .card.outer { border:2px solid rgba(0,191,255,0.7); }
 
-  input, select { padding:8px; margin:5px 0; border-radius:8px; border:1px solid #ccc; width:200px; transition:0.2s; }
+  input, select { padding:8px; margin:5px 0; border-radius:8px; border:1px solid #ccc; width:100%; box-sizing:border-box; }
   input:focus, select:focus { outline:none; border-color:#007bff; }
   body.dark input, body.dark select { background:#2c2c2c; color:#f5f5f5; border:1px solid #555; }
 
-  button { margin:4px; padding:8px 14px; border-radius:8px; cursor:pointer; border:none; font-weight:bold; transition:0.2s; }
+  button { margin:4px 2px; padding:6px 10px; border-radius:8px; cursor:pointer; border:none; font-weight:bold; transition:0.2s; flex-shrink:0; }
   button:hover { opacity:0.85; }
   .primary-btn { background:#007bff; color:white; }
   .danger-btn { background:#dc3545; color:white; }
   .edit-btn { background:#ffc107; color:#222; }
+  .pdf-btn { background:#28a745; color:white; }
 
-  ul { list-style:none; padding-left:0; }
-  li { margin:6px 0; padding:6px 10px; border-radius:8px; background:rgba(0,0,0,0.03); display:flex; justify-content:space-between; align-items:center; transition:0.2s; }
+  ul { list-style:none; padding-left:0; margin:0; }
+  li { margin:6px 0; padding:6px 10px; border-radius:8px; background:rgba(0,0,0,0.03); display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; }
   li:hover { background:rgba(0,0,0,0.08); }
   body.dark li { background:rgba(255,255,255,0.05); }
   body.dark li:hover { background:rgba(255,255,255,0.1); }
 
-  .flex-btns button { margin-left:4px; }
+  .flex-btns { display:flex; gap:4px; flex-wrap: wrap; }
   .section-title { margin-bottom:8px; }
 
-  @media(max-width:768px){ .container { flex-direction:column; } .sidebar { width:100%; border-right:none; border-bottom:2px solid rgba(0,191,255,0.5); } }
+  @media(max-width:768px){
+    .container { flex-direction:column; }
+    .sidebar { width:100%; border-right:none; border-bottom:2px solid rgba(0,191,255,0.5); }
+  }
 </style>
 </head>
 <body>
@@ -72,24 +73,27 @@
   <div class="sidebar">
     <h3>Trips</h3>
     <div id="tripsList"></div>
+
     <div class="card">
       <input type="text" id="tripName" placeholder="Trip Name">
       <input type="date" id="tripDate">
-      <button class="primary-btn" onclick="addTrip()">Add Trip</button>
+      <div class="flex-btns">
+        <button class="primary-btn" onclick="addTrip()">Add Trip</button>
+      </div>
     </div>
   </div>
 
   <div class="main">
-    <!-- Only outer card has border -->
     <div id="tripDetails" class="card outer" style="display:none;">
       <h3 id="tripTitle"></h3>
       <p><strong>Date:</strong> <span id="tripDateDisplay"></span></p>
-      
-      <!-- Inner sections without border -->
+
       <div class="card" style="box-shadow:none; border:none; padding:0; margin:10px 0;">
         <h4 class="section-title">Participants</h4>
         <input type="text" id="participantName" placeholder="Add participant">
-        <button class="primary-btn" onclick="addParticipant()">Add</button>
+        <div class="flex-btns">
+          <button class="primary-btn" onclick="addParticipant()">Add</button>
+        </div>
         <ul id="participants"></ul>
       </div>
 
@@ -98,7 +102,10 @@
         <input type="text" id="expenseDesc" placeholder="Description">
         <input type="number" id="expenseAmount" placeholder="Amount">
         <select id="expensePayer"></select>
-        <button class="primary-btn" onclick="addExpense()">Add Expense</button>
+        <div class="flex-btns">
+          <button class="primary-btn" onclick="addExpense()">Add Expense</button>
+          <button class="pdf-btn" onclick="exportPDF()">Export PDF</button>
+        </div>
         <ul id="expenses"></ul>
       </div>
 
@@ -112,65 +119,225 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-// Dark/Light Mode
-const body = document.body;
-const toggleBtn = document.getElementById("themeToggle");
-if(localStorage.getItem("theme")==="dark"){body.classList.add("dark"); toggleBtn.textContent="☀️ Light";}
-toggleBtn.addEventListener("click",()=>{
-  body.classList.toggle("dark");
-  if(body.classList.contains("dark")){
-    toggleBtn.textContent="☀️ Light"; localStorage.setItem("theme","dark");
-  }else{
-    toggleBtn.textContent="🌙 Dark"; localStorage.setItem("theme","light");
-  }
-});
-
-// JS Functions remain same as before
-let trips = [];
-let currentTrip = null;
-
-function addTrip(){
-  const name=document.getElementById('tripName').value.trim();
-  const date=document.getElementById('tripDate').value;
-  if(!name||!date){ alert("Enter trip name and date"); return;}
-  trips.push({id:Date.now(), name, date, participants:[], expenses:[]});
-  document.getElementById('tripName').value=''; document.getElementById('tripDate').value='';
-  renderTrips();
-}
-
-function deleteTrip(id){ if(!confirm("Delete this trip?")) return; trips=trips.filter(t=>t.id!==id); renderTrips(); document.getElementById("tripDetails").style.display="none"; }
-
-function openTrip(id){
-  currentTrip=trips.find(t=>t.id===id);
-  document.getElementById("tripTitle").textContent=currentTrip.name;
-  document.getElementById("tripDateDisplay").textContent=currentTrip.date;
-  document.getElementById("tripDetails").style.display="block";
-  renderParticipants(); renderExpenses(); renderPayerOptions(); renderSettlement();
-}
-
-function closeTrip(){ currentTrip=null; document.getElementById("tripDetails").style.display="none"; }
-
-function renderTrips(){
-  const list=document.getElementById("tripsList"); list.innerHTML='';
-  if(trips.length===0){ list.innerHTML="<p>No trips yet.</p>"; return;}
-  trips.forEach(t=>{
-    const div=document.createElement("div"); div.className="trip-item";
-    div.textContent = t.name + ' (' + t.participants.length + ' participants)';
-    div.onclick = ()=>openTrip(t.id);
-    list.appendChild(div);
+  // Dark/Light Mode
+  const body = document.body;
+  const toggleBtn = document.getElementById("themeToggle");
+  if(localStorage.getItem("theme")==="dark"){ body.classList.add("dark"); toggleBtn.textContent="☀️ Light";}
+  toggleBtn.addEventListener("click", ()=>{
+    body.classList.toggle("dark");
+    if(body.classList.contains("dark")){ toggleBtn.textContent="☀️ Light"; localStorage.setItem("theme","dark"); }
+    else { toggleBtn.textContent="🌙 Dark"; localStorage.setItem("theme","light"); }
   });
-}
 
-function addParticipant(){ const name=document.getElementById("participantName").value.trim(); if(!name) return; currentTrip.participants.push(name); document.getElementById("participantName").value=''; renderParticipants(); renderPayerOptions(); renderSettlement(); }
-function editParticipant(index){ const newName=prompt("Edit participant name:",currentTrip.participants[index]); if(newName){ currentTrip.participants[index]=newName; renderParticipants(); renderPayerOptions(); renderSettlement(); } }
-function deleteParticipant(index){ if(!confirm("Delete participant?")) return; currentTrip.participants.splice(index,1); renderParticipants(); renderPayerOptions(); renderSettlement(); }
-function renderParticipants(){ const list=document.getElementById("participants"); list.innerHTML=''; currentTrip.participants.forEach((p,i)=>{ const li=document.createElement("li"); li.innerHTML=`${p} <span class="flex-btns"><button class="edit-btn" onclick="editParticipant(${i})">✏️</button><button class="danger-btn" onclick="deleteParticipant(${i})">❌</button></span>`; list.appendChild(li); }); }
-function renderPayerOptions(){ const select=document.getElementById("expensePayer"); select.innerHTML=''; currentTrip.participants.forEach(p=>{ const opt=document.createElement("option"); opt.value=p; opt.textContent=p; select.appendChild(opt); }); }
-function addExpense(){ const desc=document.getElementById("expenseDesc").value.trim(); const amount=parseFloat(document.getElementById("expenseAmount").value); const payer=document.getElementById("expensePayer").value; if(!desc||!amount||!payer) return; currentTrip.expenses.push({desc, amount, payer}); document.getElementById("expenseDesc").value=''; document.getElementById("expenseAmount").value=''; renderExpenses(); renderSettlement(); }
-function renderExpenses(){ const list=document.getElementById("expenses"); list.innerHTML=''; currentTrip.expenses.forEach(e=>{ const li=document.createElement("li"); li.textContent=`${e.payer} paid ₹${e.amount} for ${e.desc}`; list.appendChild(li); }); }
-function renderSettlement(){ const ul=document.getElementById("settlementList"); ul.innerHTML=''; if(currentTrip.participants.length===0) return; const balances={}; currentTrip.participants.forEach(p=>balances[p]=0); let total=0; currentTrip.expenses.forEach(e=>{ balances[e.payer]+=e.amount; total+=e.amount; }); const share=total/currentTrip.participants.length; currentTrip.participants.forEach(p=>balances[p]-=share); const debtors=[], creditors=[]; for(const [p,bal] of Object.entries(balances)){ if(bal<0) debtors.push({p, amt:-bal}); else if(bal>0) creditors.push({p, amt:bal}); } let i=0,j=0; while(i<debtors.length && j<creditors.length){ const d=debtors[i], c=creditors[j]; const pay=Math.min(d.amt, c.amt); const li=document.createElement("li"); li.textContent=`${d.p} pays ${c.p}: ₹${pay.toFixed(2)}`; ul.appendChild(li); d.amt-=pay; c.amt-=pay; if(d.amt===0) i++; if(c.amt===0) j++; } }
+  // Trips Data
+  let trips = [];
+  let currentTrip = null;
+
+  function saveTrips(){ localStorage.setItem("tripsData", JSON.stringify(trips)); }
+  function loadTrips(){ const stored = localStorage.getItem("tripsData"); if(stored) trips=JSON.parse(stored); renderTrips(); }
+  loadTrips();
+
+  function addTrip(){
+    const name = document.getElementById("tripName").value.trim();
+    const date = document.getElementById("tripDate").value;
+    if(!name||!date){ alert("Enter trip name and date"); return;}
+    trips.push({ id: Date.now(), name, date, participants: [], expenses: [] });
+    document.getElementById("tripName").value=''; document.getElementById("tripDate").value='';
+    saveTrips(); renderTrips();
+  }
+
+  function editTrip(id){
+    const t = trips.find(trip=>trip.id===id);
+    const newName = prompt("Edit trip name:", t.name);
+    const newDate = prompt("Edit trip date:", t.date);
+    if(newName) t.name = newName;
+    if(newDate) t.date = newDate;
+    saveTrips(); renderTrips();
+    if(currentTrip && currentTrip.id===id) openTrip(id);
+  }
+
+  function deleteTrip(id){
+    if(!confirm("Delete this trip?")) return;
+    trips = trips.filter(t=>t.id!==id);
+    saveTrips();
+    renderTrips();
+    if(currentTrip && currentTrip.id===id) closeTrip();
+  }
+
+  function renderTrips(){
+    const list = document.getElementById("tripsList");
+    list.innerHTML = "";
+    if(trips.length===0){ list.innerHTML="<p>No trips yet.</p>"; return;}
+    trips.forEach(t=>{
+      const div = document.createElement("div"); div.className="trip-item";
+      div.innerHTML=`<span>${t.name} (${t.participants.length} participants)</span>
+        <div class="flex-btns">
+          <button class="edit-btn" onclick="editTrip(${t.id})">✏️</button>
+          <button class="danger-btn" onclick="deleteTrip(${t.id})">❌</button>
+        </div>`;
+      div.querySelector("span").onclick = ()=>openTrip(t.id);
+      list.appendChild(div);
+    });
+  }
+
+  // Participants
+  function addParticipant(){
+    const name = document.getElementById("participantName").value.trim(); if(!name) return;
+    currentTrip.participants.push(name);
+    document.getElementById("participantName").value='';
+    saveTrips(); renderParticipants(); renderPayerOptions(); renderSettlement();
+  }
+  function editParticipant(i){
+    const newName = prompt("Edit participant name:", currentTrip.participants[i]);
+    if(newName){ currentTrip.participants[i]=newName; saveTrips(); renderParticipants(); renderPayerOptions(); renderSettlement();}
+  }
+  function deleteParticipant(i){ if(!confirm("Delete participant?")) return; currentTrip.participants.splice(i,1); saveTrips(); renderParticipants(); renderPayerOptions(); renderSettlement();}
+  function renderParticipants(){
+    const ul = document.getElementById("participants"); ul.innerHTML='';
+    currentTrip.participants.forEach((p,i)=>{
+      const li = document.createElement("li");
+      li.innerHTML = `${p} <span class="flex-btns">
+        <button class="edit-btn" onclick="editParticipant(${i})">✏️</button>
+        <button class="danger-btn" onclick="deleteParticipant(${i})">❌</button>
+      </span>`;
+      ul.appendChild(li);
+    });
+  }
+
+  // Expenses
+  function renderPayerOptions(){
+    const select = document.getElementById("expensePayer"); select.innerHTML='';
+    currentTrip.participants.forEach(p=>{
+      const opt=document.createElement("option"); opt.value=p; opt.textContent=p; select.appendChild(opt);
+    });
+  }
+  function addExpense(){
+    const desc = document.getElementById("expenseDesc").value.trim();
+    const amount = parseFloat(document.getElementById("expenseAmount").value);
+    const payer = document.getElementById("expensePayer").value;
+    if(!desc || !amount || !payer) return;
+    currentTrip.expenses.push({desc, amount, payer});
+    document.getElementById("expenseDesc").value=''; document.getElementById("expenseAmount").value='';
+    saveTrips(); renderExpenses(); renderSettlement();
+  }
+  function renderExpenses(){
+    const ul = document.getElementById("expenses"); ul.innerHTML='';
+    currentTrip.expenses.forEach((e,i)=>{
+      const li = document.createElement("li");
+      li.textContent=`${i+1}. ${e.payer} paid ₹${e.amount} for ${e.desc}`;
+      ul.appendChild(li);
+    });
+  }
+
+  // Settlement
+  function renderSettlement(){
+    const ul = document.getElementById("settlementList"); ul.innerHTML='';
+    if(currentTrip.participants.length===0) return;
+    const balances={}; currentTrip.participants.forEach(p=>balances[p]=0);
+    let total=0;
+    currentTrip.expenses.forEach(e=>{ balances[e.payer]+=e.amount; total+=e.amount; });
+    const share = total/currentTrip.participants.length;
+    currentTrip.participants.forEach(p=>balances[p]-=share);
+
+    const debtors=[], creditors=[];
+    for(const [p,bal] of Object.entries(balances)){
+      if(bal<0) debtors.push({p, amt:-bal});
+      else if(bal>0) creditors.push({p, amt:bal});
+    }
+
+    let i=0,j=0;
+    while(i<debtors.length && j<creditors.length){
+      const d=debtors[i], c=creditors[j];
+      const pay=Math.min(d.amt,c.amt);
+      const li = document.createElement("li");
+      li.textContent=`${d.p} pays ${c.p}: ₹${pay.toFixed(2)}`;
+      ul.appendChild(li);
+      d.amt-=pay; c.amt-=pay;
+      if(d.amt===0) i++; if(c.amt===0) j++;
+    }
+  }
+
+  // Open/Close Trip
+  function openTrip(id){
+    currentTrip = trips.find(t=>t.id===id);
+    document.getElementById("tripTitle").textContent = currentTrip.name;
+    document.getElementById("tripDateDisplay").textContent = currentTrip.date;
+    document.getElementById("tripDetails").style.display="block";
+    renderParticipants(); renderExpenses(); renderPayerOptions(); renderSettlement();
+  }
+  function closeTrip(){ currentTrip=null; document.getElementById("tripDetails").style.display="none"; }
+
+  // PDF Export
+  
+  async function exportPDF() {
+    if (!currentTrip) return alert("Open a trip first!");
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let y = 10;
+
+    doc.setFontSize(16);
+    doc.text(`Trip: ${currentTrip.name}`, 10, y); y += 10;
+    doc.text(`Date: ${currentTrip.date}`, 10, y); y += 10;
+
+    // Participants
+    doc.setFontSize(14);
+    doc.text("Participants:", 10, y); y += 8;
+    doc.setFontSize(12);
+    currentTrip.participants.forEach((p, i) => {
+      doc.text(`${i + 1}. ${p}`, 12, y); y += 7;
+    });
+
+    y += 3;
+    // Expenses
+    doc.setFontSize(14);
+    doc.text("Expenses:", 10, y); y += 8;
+    doc.setFontSize(12);
+    currentTrip.expenses.forEach((e, i) => {
+      doc.text(`${i + 1}. ${e.payer} paid Rs ${e.amount} for ${e.desc}`, 12, y);
+      y += 7;
+    });
+
+    y += 3;
+    // Settlement
+    doc.setFontSize(14);
+    doc.text("Settlement Suggestions:", 10, y); y += 8;
+    doc.setFontSize(12);
+
+    // Compute settlement
+    const balances = {};
+    currentTrip.participants.forEach(p => balances[p] = 0);
+    currentTrip.expenses.forEach(e => balances[e.payer] += e.amount);
+    const total = currentTrip.expenses.reduce((a,e)=>a+e.amount,0);
+    const share = total / currentTrip.participants.length;
+    currentTrip.participants.forEach(p => balances[p]-=share);
+
+    const debtors = [], creditors = [];
+    for(const [p,bal] of Object.entries(balances)){
+      if(bal<0) debtors.push({p, amt:-bal});
+      else if(bal>0) creditors.push({p, amt:bal});
+    }
+
+    let i=0,j=0;
+    while(i<debtors.length && j<creditors.length){
+      const d = debtors[i], c = creditors[j];
+      const pay = Math.min(d.amt, c.amt);
+      doc.text(`${d.p} pays ${c.p}: Rs ${pay.toFixed(2)}`, 12, y);
+      y += 7;
+      d.amt -= pay;
+      c.amt -= pay;
+      if(d.amt===0) i++;
+      if(c.amt===0) j++;
+    }
+
+    doc.save(`${currentTrip.name}_Trip.pdf`);
+  }
+
+
+
 </script>
-
 </body>
 </html>
